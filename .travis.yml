@@ -1,0 +1,47 @@
+dist: focal
+language: node_js
+node_js:
+  - 16
+  - 18
+  - 19
+
+before_install:
+
+os:
+  - linux
+  - osx
+  - windows
+
+osx_image:
+  - xcode9.4
+  - xcode14
+
+jobs:
+  exclude:
+    - osx_image: xcode9.4
+      node_js: 18
+    - osx_image: xcode9.4
+      node_js: 19
+    - osx_image: xcode14
+      node_js: 16
+    # Only test on linux for regular test jobs
+    - if: branch != master
+      node_js: 18
+    - if: branch != master
+      node_js: 19
+    - if: type = pull_request
+      os: osx
+    - if: type = pull_request
+      os: windows
+
+script:
+  - npm run genprivkey
+  - npm run test-all
+  - echo "PRIVATE_KEY=$PRIVATE_KEY" > .env
+  - if [ "$TRAVIS_EVENT_TYPE" == "cron" ] ; then sh ./scripts/testnet.sh; fi
+
+notifications:
+  slack:
+    rooms:
+      - secure: CbhzWXY5zlDrpX5v3hws7rtO6piA5uJ3nfd4VCoVIvSAjTFX6a1sMbjZG4BUBiCIRQShqYjEbJYuVWRmm/O+xcPAsM08RuQy0TPYt/0EA0LPCO/VMwouuf8bOQ/LO9rKSXLSLR0NaC/SwdWeIWChanAXMqHmGk+TOgOKr9fUzDNYCN8/ELk8ki9C1WmJlUW+HmfkTbMu6lup6hY0vStY0gLoT8/No71MbLJ33yHPZicHYxXee3nGSX/vUdfd+hs9KTsVIo56cecTdWoOSD0KYq6y4nNsYKtRke8fnX32au238jGDWypXBSGU8IxDGIPNE4iwpxQ1WID27xZNGPIYLBwnYRMcGMC3ApSgQLTuXqqNU8ppJQ1UbleWZDNj1zbelt+7aHUNQZy3zuaPcckHF6LjZI8paETQvkzoaOGALwOtS1aWUn0GbqkRHjCFiD+GajZ+L3Zi8CKxpPv//ANHXvHQ+EX+9mPF+/vCBq0ZErIktwDbSN4J2iN19Zuqdzl25OGHkBc6q22r9Q2hWenzwe8iuutqEkHVHUy2KTeVnNn4SqQefXvvf+aKFuPD63HE9nN3PFWB3vlFMPV7/8KFFb1JJw/104z+1VYPQt9cJSIMralofV2JtabAN+ui7lnhvPgYA808spDu7JH7gPMDLMJWRP2rTqfsz4j77eurgQs=
+    on_success: change

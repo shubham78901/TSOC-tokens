@@ -1,0 +1,12 @@
+node_modules/
+out/
+dist/
+artifacts/
+test/out/
+test/dist
+test/artifacts
+**/.env
+**/scrypt.index.json
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
